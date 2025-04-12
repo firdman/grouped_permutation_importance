@@ -1,5 +1,6 @@
 # Code is based on scikit-learns permutation importance.
 import numpy as np
+import pandas as pd
 from sklearn.inspection._permutation_importance import check_random_state, \
     _weights_scorer
 
