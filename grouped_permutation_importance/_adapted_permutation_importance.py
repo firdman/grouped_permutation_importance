@@ -16,15 +16,18 @@ def _calculate_permutation_scores(estimator, X, y, sample_weight, col_idx,
     # (memmap). X.copy() on the other hand is always guaranteed to return a
     # writable data-structure whose columns can be shuffled inplace.
     X_permuted = X.copy()
+    if hasattr(X_permuted, "iloc"):
+        col_idx = [x for (x, y) in enumerate(X_permuted.columns) if y in col_idx]
     scores = np.zeros(n_repeats)
     shuffling_idx = np.arange(X.shape[0])
     for n_round in range(n_repeats):
         random_state.shuffle(shuffling_idx)
         if hasattr(X_permuted, "iloc"):
-            raise NotImplementedError("DataFrames not yet implemented.")
+            X_permuted = np.array(X_permuted)
+            X_permuted[:, col_idx] = X_permuted[[[x] for x in shuffling_idx], col_idx]
+            X_permuted = pd.DataFrame(X_permuted, columns=X.columns)
         else:
-            X_permuted[:, col_idx] = X_permuted[[[x] for x in shuffling_idx],
-                                                col_idx]
+            X_permuted[:, col_idx] = X_permuted[[[x] for x in shuffling_idx], col_idx]
         feature_score = _weights_scorer(
             scorer, estimator, X_permuted, y, sample_weight
         )
