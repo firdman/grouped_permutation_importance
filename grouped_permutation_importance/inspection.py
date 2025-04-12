@@ -1,4 +1,7 @@
 # Code is based on scikit-learns permutation importance.
+# New parameter idxs is added. It lists groups of features
+# to permute (list of lists of indexes for np.array
+# or column names for pd.DataFrame).
 import numpy as np
 from sklearn.utils.parallel import Parallel
 
