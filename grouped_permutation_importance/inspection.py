@@ -11,8 +11,8 @@ from sklearn.utils import check_random_state
 from sklearn.utils import check_array
 from sklearn.utils.parallel import delayed
 from sklearn.inspection._permutation_importance import _weights_scorer
-from grouped_permutation_importance._adapted_permutation_importance import \
-    _calculate_permutation_scores
+#from grouped_permutation_importance._adapted_permutation_importance import \
+#    _calculate_permutation_scores
 from sklearn.base import clone
 from sklearn.metrics import get_scorer
 
@@ -31,9 +31,16 @@ def grouped_permutation_importance(estimator, X, y, *, scoring=None,
             raise AttributeError("Parameter cv needs perm_set and set "
                                  "to 'train' or 'test'.")
         importances = np.empty((len(idxs), 0))
+        if hasattr(X, "iloc"):
+            idxs_num = []
+            for col_idx in idxs:
+                idxs_num += [[x for (x, y) in enumerate(X.columns) if y in col_idx]]
+            idxs = idxs_num
+            X = np.array(X)
+            y = np.array(y)
         for train_idx, test_idx in cv.split(X, y):
             model = clone(estimator)
-            model.fit(X.iloc[train_idx, :], y.iloc[train_idx, :])
+            model.fit(X[train_idx], y[train_idx])
             if perm_set == "train":
                 idx = train_idx
             else:
