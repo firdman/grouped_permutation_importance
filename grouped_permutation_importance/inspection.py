@@ -33,7 +33,7 @@ def grouped_permutation_importance(estimator, X, y, *, scoring=None,
         importances = np.empty((len(idxs), 0))
         for train_idx, test_idx in cv.split(X, y):
             model = clone(estimator)
-            model.fit(X[train_idx], y[train_idx])
+            model.fit(X.iloc[train_idx, :], y.iloc[train_idx, :])
             if perm_set == "train":
                 idx = train_idx
             else:
@@ -55,7 +55,7 @@ def grouped_permutation_importance(estimator, X, y, *, scoring=None,
                                                     random_state=None,
                                                     sample_weight=None,
                                                     cv=None,
-                                                    mode=mode)["importances"]],
+                                                    mode="abs")["importances"]],
                     axis=1)
             if verbose:
                 perf = get_scorer(scoring). \
@@ -89,6 +89,10 @@ def grouped_permutation_importance(estimator, X, y, *, scoring=None,
     ) for col_idx in idxs)
 
     importances = baseline_score - np.array(scores)
+
+    if mode == "rel":
+        importances = importances / np.sum(np.mean(importances, axis=1))
+                
     return Bunch(importances_mean=np.mean(importances, axis=1),
                  importances_std=np.std(importances, axis=1),
                  importances=importances)
