@@ -49,7 +49,7 @@ def grouped_permutation_importance(estimator, X, y, *, scoring=None,
             added = True
             if min_performance > 0:
                 perf = get_scorer(scoring). \
-                    _score_func(model.predict(X[test_idx]), y[test_idx])
+                    _score_func(y[test_idx], model.predict(X[test_idx]))
                 if perf < min_performance:
                     added = False
             if added:
@@ -66,7 +66,7 @@ def grouped_permutation_importance(estimator, X, y, *, scoring=None,
                     axis=1)
             if verbose:
                 perf = get_scorer(scoring). \
-                    _score_func(model.predict(X[test_idx]), y[test_idx])
+                    _score_func(y[test_idx], model.predict(X[test_idx]))
                 print(f"Test-Score: {perf}")
 
         if mode == "rel":
